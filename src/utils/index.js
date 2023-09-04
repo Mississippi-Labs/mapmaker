@@ -12,6 +12,7 @@ export const flagToClassName = (flag) => {
 }
 
 export const isMovableType = (type) => !(TypeFlags[type] & 1);
+export const isMovableFlag = (type) => !(type & 1);
 
 /**
  * 5 1 6
@@ -70,6 +71,7 @@ export const getRandomMovableType = (exclude = []) => {
 
 export const getImmovableCount = (points, data) => {
   return points.reduce((prev, cur) => {
-    return prev + (isMovableType(data[cur.y][cur.x]) ? 0 : 1);
+    console.log(isMovableFlag(data[cur.y][cur.x]), cur, data[cur.y][cur.x]);
+    return prev + (isMovableFlag(data[cur.y][cur.x]) ? 0 : 1);
   }, 0);
 }

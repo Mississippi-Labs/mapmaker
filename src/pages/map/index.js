@@ -10,7 +10,6 @@ import {
 import MapCell from './MapCell';
 
 import './styles.scss';
-import { InputNumber, Slider } from 'antd';
 import { MaxImmovableCount, TypeFlags } from '../../contants';
 
 const Map = () => {
@@ -48,7 +47,7 @@ const Map = () => {
 
   const setAroundPoints = () => {
     const aroundPoints = getTargetAroundPoint(target);
-    let lastImmovableCount = MaxImmovableCount - getImmovableCount(aroundPoints, data);
+    let lastImmovableCount = MaxImmovableCount - getImmovableCount([...aroundPoints, target], data);
     for (let point of aroundPoints) {
       if (data[point.y][point.x]) {
         continue;
@@ -60,6 +59,31 @@ const Map = () => {
         lastImmovableCount--;
       }
     }
+    setData([...data]);
+  }
+
+  const onKeyDown = (e) => {
+    if (e.keyCode < 37 || e.keyCode > 40) {
+      return;
+    }
+    switch (e.keyCode) {
+      case 37:
+        target.x--;
+        break;
+      case 38:
+        target.y--;
+        break;
+      case 39:
+        target.x++;
+        break;
+      case 40:
+        target.y++
+        break;
+    }
+    setTarget({
+      ...target
+    });
+    setAroundPoints();
   }
 
   useEffect(() => {
@@ -68,7 +92,7 @@ const Map = () => {
   }, []);
 
   return (
-    <div className="mi-map-wrapper">
+    <div className="mi-map-wrapper" onKeyDown={onKeyDown} tabIndex={0}>
       <div className="tool-tip">
         <ul className="cfg-list">
           <li>
