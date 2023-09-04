@@ -31,6 +31,7 @@ const Map = () => {
   const cellClassCache = useRef({});
   const { state } = useLocation();
   const cellTypeCount = useRef(state);
+  const [excludeType, setExcludeType] = useState([]);
 
   const staticData = useMemo(() => {
     return Array(height).fill(0).map(_ => Array(width).fill(0));
@@ -52,9 +53,12 @@ const Map = () => {
       if (data[point.y][point.x]) {
         continue;
       }
-      let type = lastImmovableCount === 0 ? getRandomMovableType() : getRandomType();
+      let type = lastImmovableCount === 0 ? getRandomMovableType(excludeType) : getRandomType(excludeType);
       data[point.y][point.x] = TypeFlags[type];
       cellTypeCount.current[type]--;
+      if (cellTypeCount.current[type] === 0) {
+        setExcludeType([...excludeType, type]);
+      }
       if (!isMovableType(type)) {
         lastImmovableCount--;
       }
