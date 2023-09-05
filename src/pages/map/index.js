@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
-  createEmptyData,
+  createEmptyData, expandMapData,
   flagToClassName, getImmovableCount,
   getRandomMovableType,
   getRandomType,
@@ -10,16 +10,17 @@ import {
 import MapCell from './MapCell';
 
 import './styles.scss';
-import { MaxImmovableCount, TypeFlags } from '../../contants';
+import { LimitSpace, MaxImmovableCount, Side, TypeFlags } from '../../contants';
 
 const Map = () => {
 
   const width = 21;
   const height = 11;
-  const vertexCoordinate = {
+
+  const [vertexCoordinate, setVertexCoordinate] = useState({
     x: 0,
     y: 0
-  };
+  })
 
   const { x: startX, y: startY } = vertexCoordinate;
 
@@ -31,14 +32,11 @@ const Map = () => {
   const cellClassCache = useRef({});
   const { state } = useLocation();
   const cellTypeCount = useRef(state);
-  const [excludeType, setExcludeType] = useState([]);
 
   const staticData = useMemo(() => {
     return Array(height).fill(0).map(_ => Array(width).fill(0));
   }, [width, height]);
 
-
-  console.log(state);
 
   const init = () => {
     data[target.y][target.x] = TypeFlags.space;
@@ -53,12 +51,10 @@ const Map = () => {
       if (data[point.y][point.x]) {
         continue;
       }
-      let type = lastImmovableCount === 0 ? getRandomMovableType(excludeType) : getRandomType(excludeType);
+      let type = lastImmovableCount === 0 ? getRandomMovableType(cellTypeCount.current) : getRandomType(cellTypeCount.current);
       data[point.y][point.x] = TypeFlags[type];
       cellTypeCount.current[type]--;
-      if (cellTypeCount.current[type] === 0) {
-        setExcludeType([...excludeType, type]);
-      }
+
       if (!isMovableType(type)) {
         lastImmovableCount--;
       }
@@ -73,20 +69,50 @@ const Map = () => {
     switch (e.keyCode) {
       case 37:
         target.x--;
+        if (target.x === LimitSpace) {
+          expandMapData(data, Side.left);
+          target.x++
+        }
+        if (target.x - vertexCoordinate.x === LimitSpace) {
+          vertexCoordinate.x--;
+        }
         break;
       case 38:
         target.y--;
+        if (target.y === LimitSpace) {
+          expandMapData(data, Side.top);
+          target.y++;
+        }
+        if (target.y - vertexCoordinate.y === LimitSpace) {
+          vertexCoordinate.y--;
+        }
         break;
       case 39:
         target.x++;
+        if (data[0].length - target.x === LimitSpace) {
+          expandMapData(data, Side.right)
+        }
+        if (width - target.x + vertexCoordinate.x === LimitSpace) {
+          vertexCoordinate.x++;
+        }
         break;
-      case 40:
+      default:
         target.y++
+        if (data.length - target.y === LimitSpace) {
+          expandMapData(data, Side.bottom);
+        }
+        if (height - target.y + vertexCoordinate.y === LimitSpace) {
+          vertexCoordinate.y++;
+        }
         break;
     }
     setTarget({
       ...target
     });
+    setVertexCoordinate({
+      ...vertexCoordinate
+    });
+    setData([...data]);
     setAroundPoints();
   }
 
@@ -94,6 +120,8 @@ const Map = () => {
     init();
     setAroundPoints();
   }, []);
+
+  console.log(vertexCoordinate);
 
   return (
     <div className="mi-map-wrapper" onKeyDown={onKeyDown} tabIndex={0}>

@@ -1,4 +1,4 @@
-import { FlagTypes, TypeFlags } from '../contants';
+import { FlagTypes, Side, TypeFlags } from '../contants';
 
 export const createEmptyData = (width, height) => {
   return Array(height).fill(0).map(() => Array(width).fill(0));
@@ -11,8 +11,8 @@ export const flagToClassName = (flag) => {
   return FlagTypes.get(flag);
 }
 
-export const isMovableType = (type) => !(TypeFlags[type] & 1);
-export const isMovableFlag = (type) => !(type & 1);
+export const isMovableType = (type) => !(TypeFlags[type] & 1) && (TypeFlags[type] !== TypeFlags.empty);
+export const isMovableFlag = (type) => !(type & 1) && (type !== TypeFlags.empty);
 
 /**
  * 5 1 6
@@ -51,27 +51,44 @@ export const getTargetAroundPoint = (target) => {
 
 const types = Object.keys(TypeFlags);
 console.log(types, 'types')
-export const getRandomType = (exclude = []) => {
-  let type;
-  do {
-    type = types[~~(Math.random() * types.length)]
-  } while (exclude.includes(type))
-  return type;
+export const getRandomType = (typeMap) => {
+  const types = Object.keys(typeMap).filter(type => typeMap[type] > 0);
+  return types[~~(Math.random() * types.length)];
 }
 
 const movableTypes = types.filter(isMovableType);
 console.log(movableTypes, 'movableTypes')
-export const getRandomMovableType = (exclude = []) => {
-  let type;
-  do {
-    type = movableTypes[~~(Math.random() * movableTypes.length)]
-  } while (exclude.includes(type))
-  return type;
+export const getRandomMovableType = (typeMap) => {
+  const types = Object.keys(typeMap).filter(type => typeMap[type] > 0 && isMovableType(type));
+  return types[~~(Math.random() * types.length)];
 }
 
 export const getImmovableCount = (points, data) => {
   return points.reduce((prev, cur) => {
-    console.log(isMovableFlag(data[cur.y][cur.x]), cur, data[cur.y][cur.x]);
-    return prev + (isMovableFlag(data[cur.y][cur.x]) ? 0 : 1);
+    const flag = data[cur.y][cur.x];
+    if (flag === TypeFlags.empty || isMovableFlag(flag)) {
+      return prev;
+    }
+    return prev + 1;
   }, 0);
+};
+
+export const expandMapData = (data, side) => {
+  switch (side) {
+    case Side.top:
+      data.unshift(Array(data[0].length).fill(TypeFlags.empty));
+      break;
+    case Side.bottom:
+      data.push(Array(data[0].length).fill(TypeFlags.empty));
+      break;
+    case Side.left:
+      data.forEach((row) => {
+        row.unshift(TypeFlags.empty);
+      })
+      break;
+    default:
+      data.forEach((row) => {
+        row.push(TypeFlags.empty);
+      })
+  }
 }
