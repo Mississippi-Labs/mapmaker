@@ -49,15 +49,11 @@ export const getTargetAroundPoint = (target) => {
   }))
 };
 
-const types = Object.keys(TypeFlags);
-console.log(types, 'types')
 export const getRandomType = (typeMap) => {
   const types = Object.keys(typeMap).filter(type => typeMap[type] > 0);
   return types[~~(Math.random() * types.length)];
 }
 
-const movableTypes = types.filter(isMovableType);
-console.log(movableTypes, 'movableTypes')
 export const getRandomMovableType = (typeMap) => {
   const types = Object.keys(typeMap).filter(type => typeMap[type] > 0 && isMovableType(type));
   return types[~~(Math.random() * types.length)];

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, NavLink, Link } from 'react-router-dom';
 import {
   createEmptyData, expandMapData,
   flagToClassName, getImmovableCount,
@@ -48,7 +48,6 @@ const Map = () => {
   const setAroundPoints = () => {
     const aroundPoints = getTargetAroundPoint(target);
     let lastImmovableCount = MaxImmovableCount - getImmovableCount([...aroundPoints, target], data);
-    console.log(lastImmovableCount, 'lastImmovableCount before set')
     for (let point of aroundPoints) {
       if (data[point.y][point.x]) {
         continue;
@@ -156,8 +155,10 @@ const Map = () => {
           </li>
         </ul>
         <div className="opt-wrapper">
-          <button className="restart">Restart</button>
-          <button className="back">Back</button>
+          <button className="restart" onClick={() => window.location.reload()}>Restart</button>
+          <button className="back">
+            <Link to="/">Back</Link>
+          </button>
         </div>
       </div>
       <div className="mi-map-content">

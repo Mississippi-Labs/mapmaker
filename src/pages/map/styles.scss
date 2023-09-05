@@ -43,6 +43,12 @@ $cellSize: 30px;
 
         .back {
             background: red;
+
+            a {
+                display: block;
+                color: inherit;
+                text-decoration: none;
+            }
         }
     }
 
