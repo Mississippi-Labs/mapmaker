@@ -11,11 +11,12 @@ import MapCell from './MapCell';
 
 import './styles.scss';
 import { LimitSpace, MaxImmovableCount, Side, TypeFlags } from '../../contants';
+import { message } from 'antd';
 
 const Map = () => {
 
-  const width = 21;
-  const height = 11;
+  const width = 43;
+  const height = 23;
 
   const [vertexCoordinate, setVertexCoordinate] = useState({
     x: 0,
@@ -26,12 +27,12 @@ const Map = () => {
 
   const [data, setData] = useState(createEmptyData(width, height));
   const [target, setTarget] = useState({
-    x: 10,
-    y: 5
+    x: ~~(width / 2),
+    y: ~~(height / 2)
   })
   const cellClassCache = useRef({});
-  const { state } = useLocation();
-  const cellTypeCount = useRef(state);
+  const { state = {} } = useLocation();
+  const cellTypeCount = useRef({ ...state });
 
   const staticData = useMemo(() => {
     return Array(height).fill(0).map(_ => Array(width).fill(0));
@@ -47,11 +48,12 @@ const Map = () => {
   const setAroundPoints = () => {
     const aroundPoints = getTargetAroundPoint(target);
     let lastImmovableCount = MaxImmovableCount - getImmovableCount([...aroundPoints, target], data);
+    console.log(lastImmovableCount, 'lastImmovableCount before set')
     for (let point of aroundPoints) {
       if (data[point.y][point.x]) {
         continue;
       }
-      let type = lastImmovableCount === 0 ? getRandomMovableType(cellTypeCount.current) : getRandomType(cellTypeCount.current);
+      let type = lastImmovableCount <= 0 ? getRandomMovableType(cellTypeCount.current) : getRandomType(cellTypeCount.current);
       data[point.y][point.x] = TypeFlags[type];
       cellTypeCount.current[type]--;
 
@@ -121,7 +123,12 @@ const Map = () => {
     setAroundPoints();
   }, []);
 
-  console.log(vertexCoordinate);
+  useEffect(() => {
+    if (cellTypeCount.current?.space === 0) {
+      message.info('The map is generated');
+    }
+  }, [cellTypeCount.current?.space])
+
 
   return (
     <div className="mi-map-wrapper" onKeyDown={onKeyDown} tabIndex={0}>
