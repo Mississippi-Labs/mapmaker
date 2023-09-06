@@ -8,12 +8,21 @@ $cellSize: 30px;
     height: 100vh;
     justify-content: center;
     align-items: center;
-    background: #f3cf78;
+    //background: #f3cf78;
 
     .tool-tip {
         display: flex;
         width: $col * $cellSize;
         justify-content: space-between;
+        background: rgb(254, 219, 141);
+        border: 3px solid #514b45;
+        border-bottom: 0;
+        border-radius: 10px 10px 0 0;
+
+        ul {
+            display: flex;
+            margin-left: 20px;
+        }
 
         li {
             display: flex;
@@ -56,7 +65,7 @@ $cellSize: 30px;
         min-width: $col * $cellSize;
         min-height: $row * $cellSize;
         box-sizing: content-box;
-        border: 3px solid #000;
+        border: 3px solid #514b45;
         background: #eee;
     }
 
@@ -70,7 +79,7 @@ $cellSize: 30px;
         position: relative;
         height: inherit;
         background-size: 100%;
-        border: 1px solid #000;
+        border: 1px solid #cfc1b3;
 
         &.target::before {
             content: '';
