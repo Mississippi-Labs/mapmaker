@@ -1,4 +1,4 @@
-import { FlagTypes, Side, TypeFlags } from '../contants';
+import { Count2Weight, FlagTypes, Side, TypeFlags, Types } from '../contants';
 
 export const createEmptyData = (width, height) => {
   return Array(height).fill(0).map(() => Array(width).fill(0));
@@ -49,14 +49,31 @@ export const getTargetAroundPoint = (target) => {
   }))
 };
 
-export const getRandomType = (typeMap) => {
-  const types = Object.keys(typeMap).filter(type => typeMap[type] > 0);
-  return types[~~(Math.random() * types.length)];
+export const getTypeByWeight = (types, adjacentTypeCount) => {
+  let totalWeight = 0;
+  const typesWeight = types.map((type) => {
+    const weight = (adjacentTypeCount[type] && type !== Types.space) ? Count2Weight[adjacentTypeCount[type]] : 1;
+    totalWeight += weight;
+    return weight;
+  });
+  const random = Math.random();
+  let temp = 0;
+  const index = typesWeight.findIndex((weight) => {
+    temp += weight;
+    return random < temp / totalWeight;
+  });
+  return types[index];
 }
 
-export const getRandomMovableType = (typeMap) => {
+export const getRandomType = (typeMap, adjacentTypeCount) => {
+  const types = Object.keys(typeMap).filter(type => typeMap[type] > 0);
+  types.push(Types.wall);
+  return getTypeByWeight(types, adjacentTypeCount);
+}
+
+export const getRandomMovableType = (typeMap, adjacentTypeCount) => {
   const types = Object.keys(typeMap).filter(type => typeMap[type] > 0 && isMovableType(type));
-  return types[~~(Math.random() * types.length)];
+  return getTypeByWeight(types, adjacentTypeCount);
 }
 
 export const getImmovableCount = (points, data) => {
@@ -86,5 +103,66 @@ export const expandMapData = (data, side) => {
       data.forEach((row) => {
         row.push(TypeFlags.empty);
       })
+  }
+}
+
+const adjacentPoints = [
+  { x: 0, y: -1}, { x: -1, y: 0}, { x: 0, y: 1}, { x: 1, y: 0}
+];
+export const getAdjacentTypeCount = (data, point) => {
+  const count = {};
+  adjacentPoints.forEach((item) => {
+    const adjacentPoint = {
+      x: point.x + item.x,
+      y: point.y + item.y
+    };
+    const type = FlagTypes.get(data[adjacentPoint.y][adjacentPoint.x]);
+    if (count[type]) {
+      count[type]++
+    } else {
+      count[type] = 1;
+    }
+  });
+  return count;
+}
+
+export const getFilledWallData = (data) => {
+  data.forEach((row, y) => {
+    row.forEach((flag, x) => {
+      if (flag === TypeFlags.empty) {
+        const aroundNotEmpty = around1RelativePoints.some((point) => {
+          const relativePoint = {
+            x: x + point.x,
+            y: y + point.y
+          };
+          const relativeFlag = data[relativePoint.y]?.[relativePoint.x];
+          return relativeFlag !== undefined && relativeFlag !== TypeFlags.empty && relativeFlag !== TypeFlags.wall;
+        });
+        if (aroundNotEmpty) {
+          data[y][x] = TypeFlags.wall;
+        }
+      }
+    });
+  })
+  return [...data];
+}
+
+export const getFormatMUDData = (data) => {
+  const start = {
+    x: data[0].findIndex((_, index) => data.some((row) => row[index] !== TypeFlags.empty)),
+    y: data.findIndex((row) => row.some(flag => flag !== TypeFlags.empty))
+  };
+
+  const end = {
+    x: data[0].findLastIndex((_, index) => data.some((row) => row[index] !== TypeFlags.empty)),
+    y: data.findLastIndex((row) => row.some(flag => flag !== TypeFlags.empty)),
+  };
+
+  const mudData = data.slice(start.y, end.y + 1).map((row) => row.slice(start.x, end.x + 1)).flat();
+
+  return {
+    start,
+    end,
+    mudData: new Uint8Array(mudData)
   }
 }

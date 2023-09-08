@@ -32,7 +32,7 @@ const Home = () => {
           </div>
 
           <h3>Space</h3>
-          <InputNumber value={space} onChange={(e) => setSpace(e.target.value)}/>
+          <InputNumber value={space} onChange={(value) => setSpace(~~value)}/>
         </li>
         <li>
           <div className="img-wrapper">

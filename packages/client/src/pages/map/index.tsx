@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation, NavLink, Link } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import {
   createEmptyData, expandMapData,
-  flagToClassName, getImmovableCount,
+  flagToClassName, getAdjacentTypeCount, getFilledWallData, getFormatMUDData, getImmovableCount,
   getRandomMovableType,
   getRandomType,
   getTargetAroundPoint, isMovableType
@@ -10,8 +10,9 @@ import {
 import MapCell from './MapCell';
 
 import './styles.scss';
-import { LimitSpace, MaxImmovableCount, Side, TypeFlags } from '../../contants';
+import { LimitSpace, MaxImmovableCount, Side, TypeFlags, Types } from '../../contants';
 import { message } from 'antd';
+import { useMUD } from '../../MUDContext';
 
 const Map = () => {
 
@@ -33,10 +34,15 @@ const Map = () => {
   const cellClassCache = useRef({});
   const { state = {} } = useLocation();
   const cellTypeCount = useRef({ ...state });
+  const [finished, setFinished] = useState(false);
 
   const staticData = useMemo(() => {
-    return Array(height).fill(0).map(_ => Array(width).fill(0));
+    return Array(height).fill(0).map(() => Array(width).fill(0));
   }, [width, height]);
+
+  const {
+    systemCalls: { move },
+  } = useMUD();
 
 
   const init = () => {
@@ -48,13 +54,19 @@ const Map = () => {
   const setAroundPoints = () => {
     const aroundPoints = getTargetAroundPoint(target);
     let lastImmovableCount = MaxImmovableCount - getImmovableCount([...aroundPoints, target], data);
-    for (let point of aroundPoints) {
+    for (const point of aroundPoints) {
+      if (cellTypeCount.current?.space === 0) {
+        break;
+      }
       if (data[point.y][point.x]) {
         continue;
       }
-      let type = lastImmovableCount <= 0 ? getRandomMovableType(cellTypeCount.current) : getRandomType(cellTypeCount.current);
+      const adjacentTypeCount = getAdjacentTypeCount(data, point);
+      const type = lastImmovableCount <= 0 ? getRandomMovableType(cellTypeCount.current, adjacentTypeCount) : getRandomType(cellTypeCount.current, adjacentTypeCount);
       data[point.y][point.x] = TypeFlags[type];
-      cellTypeCount.current[type]--;
+      if (type !== Types.wall) {
+        cellTypeCount.current[type]--;
+      }
 
       if (!isMovableType(type)) {
         lastImmovableCount--;
@@ -64,7 +76,7 @@ const Map = () => {
   }
 
   const onKeyDown = (e) => {
-    if (e.keyCode < 37 || e.keyCode > 40) {
+    if (finished || e.keyCode < 37 || e.keyCode > 40) {
       return;
     }
     switch (e.keyCode) {
@@ -117,6 +129,11 @@ const Map = () => {
     setAroundPoints();
   }
 
+  const save = () => {
+    const { start, end, mudData } = getFormatMUDData(data);
+    move(target.x - start.x, target.y - start.y, end.x - start.x, mudData);
+  }
+
   useEffect(() => {
     init();
     setAroundPoints();
@@ -125,6 +142,8 @@ const Map = () => {
   useEffect(() => {
     if (cellTypeCount.current?.space === 0) {
       message.info('The map is generated');
+      setFinished(true);
+      setData(getFilledWallData(data));
     }
   }, [cellTypeCount.current?.space])
 
@@ -155,6 +174,11 @@ const Map = () => {
           </li>
         </ul>
         <div className="opt-wrapper">
+          <button
+            className="save"
+            disabled={!finished}
+            onClick={save}
+          >Save</button>
           <button className="restart" onClick={() => window.location.reload()}>Restart</button>
           <button className="back">
             <Link to="/">Back</Link>

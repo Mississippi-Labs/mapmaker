@@ -50,6 +50,15 @@ $cellSize: 30px;
             background: #61dafb;
         }
 
+        .save {
+            background: #47e55a;
+
+            &[disabled] {
+                background: #999;
+                cursor: not-allowed;
+            }
+        }
+
         .back {
             background: red;
 

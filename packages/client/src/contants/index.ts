@@ -1,3 +1,13 @@
+export const Types = {
+  empty: 'empty',
+  wall : 'wall',
+  space: 'space',
+  grass: 'grass',
+  water: 'water',
+  stone: 'stone',
+  hole : 'hole',
+}
+
 export const TypeFlags = {
   empty: 0,
   wall : 0b1,
@@ -26,3 +36,10 @@ export const Side = {
 };
 
 export const LimitSpace = 3;
+
+export const Count2Weight = {
+  1: 2,
+  2: 4,
+  3: 10,
+  4: 100000000
+}
