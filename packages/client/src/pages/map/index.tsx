@@ -12,6 +12,7 @@ import MapCell from './MapCell';
 import './styles.scss';
 import { LimitSpace, MaxImmovableCount, Side, TypeFlags, Types } from '../../contants';
 import { message } from 'antd';
+import { useMUD } from '../../MUDContext';
 
 const Map = () => {
 
@@ -38,6 +39,10 @@ const Map = () => {
   const staticData = useMemo(() => {
     return Array(height).fill(0).map(() => Array(width).fill(0));
   }, [width, height]);
+
+  const {
+    systemCalls: { move },
+  } = useMUD();
 
 
   const init = () => {
@@ -125,8 +130,8 @@ const Map = () => {
   }
 
   const save = () => {
-    const result = getFormatMUDData(data);
-    console.log(result);
+    const { start, end, mudData } = getFormatMUDData(data);
+    move(target.x - start.x, target.y - start.y, end.x - start.x, mudData);
   }
 
   useEffect(() => {
