@@ -16,7 +16,7 @@ contract MapSystem is System {
 
   function getData() public view returns(uint32, uint32, bytes memory) {
     bytes32 player = addressToEntityKey(address(_msgSender()));
-    require(Player.get(player), "already spawned");
+    require(Player.get(player), "haven't spawned");
 
     return Position.get(player);
   }

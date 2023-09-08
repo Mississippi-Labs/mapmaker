@@ -22,5 +22,8 @@ extra_output_files = [
 ]
 fs_permissions = [{ access = "read", path = "./"}]
 
-[profile.lattice-testnet]
-eth_rpc_url = "https://follower.testnet-chain.linfra.xyz"
+[profile.op-testnet]
+eth_rpc_url = "https://broken-blissful-snow.optimism-goerli.discover.quiknode.pro/75e24d817fa323c5e800637b6329f93f299b9de1/"
+
+[profile.sepolia-testnet]
+eth_rpc_url = "https://sepolia.infura.io/v3/5ca372516740427e97512d4dfefd9c47"
