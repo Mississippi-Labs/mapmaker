@@ -52,6 +52,11 @@ $cellSize: 30px;
 
         .save {
             background: #47e55a;
+
+            &[disabled] {
+                background: #999;
+                cursor: not-allowed;
+            }
         }
 
         .back {

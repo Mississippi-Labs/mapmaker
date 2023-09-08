@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import {
   createEmptyData, expandMapData,
-  flagToClassName, getAdjacentTypeCount, getFilledWallData, getImmovableCount,
+  flagToClassName, getAdjacentTypeCount, getFilledWallData, getFormatMUDData, getImmovableCount,
   getRandomMovableType,
   getRandomType,
   getTargetAroundPoint, isMovableType
@@ -125,7 +125,8 @@ const Map = () => {
   }
 
   const save = () => {
-    console.log('save')
+    const result = getFormatMUDData(data);
+    console.log(result);
   }
 
   useEffect(() => {

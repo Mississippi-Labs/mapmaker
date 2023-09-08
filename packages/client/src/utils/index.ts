@@ -146,3 +146,23 @@ export const getFilledWallData = (data) => {
   })
   return [...data];
 }
+
+export const getFormatMUDData = (data) => {
+  const start = {
+    x: data[0].findIndex((_, index) => data.some((row) => row[index] !== TypeFlags.empty)),
+    y: data.findIndex((row) => row.some(flag => flag !== TypeFlags.empty))
+  };
+
+  const end = {
+    x: data[0].findLastIndex((_, index) => data.some((row) => row[index] !== TypeFlags.empty)),
+    y: data.findLastIndex((row) => row.some(flag => flag !== TypeFlags.empty)),
+  };
+
+  const mudData = data.slice(start.y, end.y + 1).map((row) => row.slice(start.x, end.x + 1)).flat();
+
+  return {
+    start,
+    end,
+    mudData: new Uint8Array(mudData)
+  }
+}
