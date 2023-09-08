@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation, NavLink, Link } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import {
   createEmptyData, expandMapData,
-  flagToClassName, getImmovableCount,
+  flagToClassName, getAdjacentTypeCount, getImmovableCount,
   getRandomMovableType,
   getRandomType,
   getTargetAroundPoint, isMovableType
@@ -10,7 +10,7 @@ import {
 import MapCell from './MapCell';
 
 import './styles.scss';
-import { LimitSpace, MaxImmovableCount, Side, TypeFlags } from '../../contants';
+import { LimitSpace, MaxImmovableCount, Side, TypeFlags, Types } from '../../contants';
 import { message } from 'antd';
 
 const Map = () => {
@@ -35,7 +35,7 @@ const Map = () => {
   const cellTypeCount = useRef({ ...state });
 
   const staticData = useMemo(() => {
-    return Array(height).fill(0).map(_ => Array(width).fill(0));
+    return Array(height).fill(0).map(() => Array(width).fill(0));
   }, [width, height]);
 
 
@@ -48,13 +48,16 @@ const Map = () => {
   const setAroundPoints = () => {
     const aroundPoints = getTargetAroundPoint(target);
     let lastImmovableCount = MaxImmovableCount - getImmovableCount([...aroundPoints, target], data);
-    for (let point of aroundPoints) {
+    for (const point of aroundPoints) {
       if (data[point.y][point.x]) {
         continue;
       }
-      let type = lastImmovableCount <= 0 ? getRandomMovableType(cellTypeCount.current) : getRandomType(cellTypeCount.current);
+      const adjacentTypeCount = getAdjacentTypeCount(data, point);
+      const type = lastImmovableCount <= 0 ? getRandomMovableType(cellTypeCount.current, adjacentTypeCount) : getRandomType(cellTypeCount.current, adjacentTypeCount);
       data[point.y][point.x] = TypeFlags[type];
-      cellTypeCount.current[type]--;
+      if (type !== Types.wall) {
+        cellTypeCount.current[type]--;
+      }
 
       if (!isMovableType(type)) {
         lastImmovableCount--;
@@ -155,6 +158,7 @@ const Map = () => {
           </li>
         </ul>
         <div className="opt-wrapper">
+          <button className="save">Save</button>
           <button className="restart" onClick={() => window.location.reload()}>Restart</button>
           <button className="back">
             <Link to="/">Back</Link>
