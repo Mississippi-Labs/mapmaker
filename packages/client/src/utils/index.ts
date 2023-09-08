@@ -126,3 +126,23 @@ export const getAdjacentTypeCount = (data, point) => {
   return count;
 }
 
+export const getFilledWallData = (data) => {
+  data.forEach((row, y) => {
+    row.forEach((flag, x) => {
+      if (flag === TypeFlags.empty) {
+        const aroundNotEmpty = around1RelativePoints.some((point) => {
+          const relativePoint = {
+            x: x + point.x,
+            y: y + point.y
+          };
+          const relativeFlag = data[relativePoint.y]?.[relativePoint.x];
+          return relativeFlag !== undefined && relativeFlag !== TypeFlags.empty && relativeFlag !== TypeFlags.wall;
+        });
+        if (aroundNotEmpty) {
+          data[y][x] = TypeFlags.wall;
+        }
+      }
+    });
+  })
+  return [...data];
+}

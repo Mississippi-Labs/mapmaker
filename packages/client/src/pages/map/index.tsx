@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import {
   createEmptyData, expandMapData,
-  flagToClassName, getAdjacentTypeCount, getImmovableCount,
+  flagToClassName, getAdjacentTypeCount, getFilledWallData, getImmovableCount,
   getRandomMovableType,
   getRandomType,
   getTargetAroundPoint, isMovableType
@@ -33,6 +33,7 @@ const Map = () => {
   const cellClassCache = useRef({});
   const { state = {} } = useLocation();
   const cellTypeCount = useRef({ ...state });
+  const [finished, setFinished] = useState(false);
 
   const staticData = useMemo(() => {
     return Array(height).fill(0).map(() => Array(width).fill(0));
@@ -49,6 +50,9 @@ const Map = () => {
     const aroundPoints = getTargetAroundPoint(target);
     let lastImmovableCount = MaxImmovableCount - getImmovableCount([...aroundPoints, target], data);
     for (const point of aroundPoints) {
+      if (cellTypeCount.current?.space === 0) {
+        break;
+      }
       if (data[point.y][point.x]) {
         continue;
       }
@@ -67,7 +71,7 @@ const Map = () => {
   }
 
   const onKeyDown = (e) => {
-    if (e.keyCode < 37 || e.keyCode > 40) {
+    if (finished || e.keyCode < 37 || e.keyCode > 40) {
       return;
     }
     switch (e.keyCode) {
@@ -120,6 +124,10 @@ const Map = () => {
     setAroundPoints();
   }
 
+  const save = () => {
+    console.log('save')
+  }
+
   useEffect(() => {
     init();
     setAroundPoints();
@@ -128,6 +136,8 @@ const Map = () => {
   useEffect(() => {
     if (cellTypeCount.current?.space === 0) {
       message.info('The map is generated');
+      setFinished(true);
+      setData(getFilledWallData(data));
     }
   }, [cellTypeCount.current?.space])
 
@@ -158,7 +168,11 @@ const Map = () => {
           </li>
         </ul>
         <div className="opt-wrapper">
-          <button className="save">Save</button>
+          <button
+            className="save"
+            disabled={!finished}
+            onClick={save}
+          >Save</button>
           <button className="restart" onClick={() => window.location.reload()}>Restart</button>
           <button className="back">
             <Link to="/">Back</Link>
