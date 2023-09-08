@@ -13,6 +13,7 @@ export type SetupNetworkResult = Awaited<ReturnType<typeof setupNetwork>>;
 export async function setupNetwork() {
   const networkConfig = await getNetworkConfig();
 
+
   const clientOptions = {
     chain: networkConfig.chain,
     transport: transportObserver(fallback([webSocket(), http()])),
@@ -26,6 +27,7 @@ export async function setupNetwork() {
     ...clientOptions,
     account: burnerAccount,
   });
+
 
   const write$ = new Subject<ContractWrite>();
   const worldContract = createContract({

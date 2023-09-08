@@ -9,8 +9,9 @@ export function createSystemCalls(
   { worldContract, waitForTransaction }: SetupNetworkResult,
   ClientComponents
 ) {
-  const { Counter, Position } = ClientComponents;
-  console.log(Position, Counter, ClientComponents)
+  const { Counter, Position, MapSystem } = ClientComponents;
+  console.log(Position, MapSystem, ClientComponents)
+
   const increment = async () => {
     const tx = await worldContract.write.increment();
     await waitForTransaction(tx);
@@ -20,11 +21,10 @@ export function createSystemCalls(
   const move = async (x: number, y: number, width: number, data: Uint8Array) => {
     const tx = await worldContract.write.move(x, y, width, data);
     await waitForTransaction(tx);
-    return getComponentValue(Position, singletonEntity);
+    // return getComponentValue(MapSystem, singletonEntity);
   };
 
   return {
-    increment,
     move
   };
 }
