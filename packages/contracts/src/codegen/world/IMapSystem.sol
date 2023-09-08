@@ -6,7 +6,7 @@ pragma solidity >=0.8.0;
 interface IMapSystem {
   function spawn(uint32 x, uint32 y) external;
 
-  function getData() external view returns (uint32, uint32, bytes memory);
+  function getData() external view returns (uint32, uint32, uint32, bytes memory);
 
-  function move(uint32 x, uint32 y, bytes calldata data) external;
+  function move(uint32 x, uint32 y, uint32 width, bytes calldata data) external;
 }

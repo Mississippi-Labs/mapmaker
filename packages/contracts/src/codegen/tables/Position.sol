@@ -31,10 +31,11 @@ library Position {
 
   /** Get the table's value schema */
   function getValueSchema() internal pure returns (Schema) {
-    SchemaType[] memory _schema = new SchemaType[](3);
+    SchemaType[] memory _schema = new SchemaType[](4);
     _schema[0] = SchemaType.UINT32;
     _schema[1] = SchemaType.UINT32;
-    _schema[2] = SchemaType.BYTES;
+    _schema[2] = SchemaType.UINT32;
+    _schema[3] = SchemaType.BYTES;
 
     return SchemaLib.encode(_schema);
   }
@@ -47,10 +48,11 @@ library Position {
 
   /** Get the table's field names */
   function getFieldNames() internal pure returns (string[] memory fieldNames) {
-    fieldNames = new string[](3);
+    fieldNames = new string[](4);
     fieldNames[0] = "x";
     fieldNames[1] = "y";
-    fieldNames[2] = "mapdata";
+    fieldNames[2] = "width";
+    fieldNames[3] = "mapdata";
   }
 
   /** Register the table's key schema, value schema, key names and value names */
@@ -131,12 +133,46 @@ library Position {
     _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((y)), getValueSchema());
   }
 
+  /** Get width */
+  function getWidth(bytes32 key) internal view returns (uint32 width) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = key;
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 2, getValueSchema());
+    return (uint32(Bytes.slice4(_blob, 0)));
+  }
+
+  /** Get width (using the specified store) */
+  function getWidth(IStore _store, bytes32 key) internal view returns (uint32 width) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = key;
+
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 2, getValueSchema());
+    return (uint32(Bytes.slice4(_blob, 0)));
+  }
+
+  /** Set width */
+  function setWidth(bytes32 key, uint32 width) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = key;
+
+    StoreSwitch.setField(_tableId, _keyTuple, 2, abi.encodePacked((width)), getValueSchema());
+  }
+
+  /** Set width (using the specified store) */
+  function setWidth(IStore _store, bytes32 key, uint32 width) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = key;
+
+    _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((width)), getValueSchema());
+  }
+
   /** Get mapdata */
   function getMapdata(bytes32 key) internal view returns (bytes memory mapdata) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = key;
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 2, getValueSchema());
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 3, getValueSchema());
     return (bytes(_blob));
   }
 
@@ -145,7 +181,7 @@ library Position {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = key;
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 2, getValueSchema());
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 3, getValueSchema());
     return (bytes(_blob));
   }
 
@@ -154,7 +190,7 @@ library Position {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = key;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 2, bytes((mapdata)), getValueSchema());
+    StoreSwitch.setField(_tableId, _keyTuple, 3, bytes((mapdata)), getValueSchema());
   }
 
   /** Set mapdata (using the specified store) */
@@ -162,7 +198,7 @@ library Position {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = key;
 
-    _store.setField(_tableId, _keyTuple, 2, bytes((mapdata)), getValueSchema());
+    _store.setField(_tableId, _keyTuple, 3, bytes((mapdata)), getValueSchema());
   }
 
   /** Get the length of mapdata */
@@ -170,7 +206,7 @@ library Position {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = key;
 
-    uint256 _byteLength = StoreSwitch.getFieldLength(_tableId, _keyTuple, 2, getValueSchema());
+    uint256 _byteLength = StoreSwitch.getFieldLength(_tableId, _keyTuple, 3, getValueSchema());
     unchecked {
       return _byteLength / 1;
     }
@@ -181,7 +217,7 @@ library Position {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = key;
 
-    uint256 _byteLength = _store.getFieldLength(_tableId, _keyTuple, 2, getValueSchema());
+    uint256 _byteLength = _store.getFieldLength(_tableId, _keyTuple, 3, getValueSchema());
     unchecked {
       return _byteLength / 1;
     }
@@ -199,7 +235,7 @@ library Position {
       bytes memory _blob = StoreSwitch.getFieldSlice(
         _tableId,
         _keyTuple,
-        2,
+        3,
         getValueSchema(),
         _index * 1,
         (_index + 1) * 1
@@ -217,7 +253,7 @@ library Position {
     _keyTuple[0] = key;
 
     unchecked {
-      bytes memory _blob = _store.getFieldSlice(_tableId, _keyTuple, 2, getValueSchema(), _index * 1, (_index + 1) * 1);
+      bytes memory _blob = _store.getFieldSlice(_tableId, _keyTuple, 3, getValueSchema(), _index * 1, (_index + 1) * 1);
       return (bytes(_blob));
     }
   }
@@ -227,7 +263,7 @@ library Position {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = key;
 
-    StoreSwitch.pushToField(_tableId, _keyTuple, 2, bytes((_slice)), getValueSchema());
+    StoreSwitch.pushToField(_tableId, _keyTuple, 3, bytes((_slice)), getValueSchema());
   }
 
   /** Push a slice to mapdata (using the specified store) */
@@ -235,7 +271,7 @@ library Position {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = key;
 
-    _store.pushToField(_tableId, _keyTuple, 2, bytes((_slice)), getValueSchema());
+    _store.pushToField(_tableId, _keyTuple, 3, bytes((_slice)), getValueSchema());
   }
 
   /** Pop a slice from mapdata */
@@ -243,7 +279,7 @@ library Position {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = key;
 
-    StoreSwitch.popFromField(_tableId, _keyTuple, 2, 1, getValueSchema());
+    StoreSwitch.popFromField(_tableId, _keyTuple, 3, 1, getValueSchema());
   }
 
   /** Pop a slice from mapdata (using the specified store) */
@@ -251,7 +287,7 @@ library Position {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = key;
 
-    _store.popFromField(_tableId, _keyTuple, 2, 1, getValueSchema());
+    _store.popFromField(_tableId, _keyTuple, 3, 1, getValueSchema());
   }
 
   /**
@@ -263,7 +299,7 @@ library Position {
     _keyTuple[0] = key;
 
     unchecked {
-      StoreSwitch.updateInField(_tableId, _keyTuple, 2, _index * 1, bytes((_slice)), getValueSchema());
+      StoreSwitch.updateInField(_tableId, _keyTuple, 3, _index * 1, bytes((_slice)), getValueSchema());
     }
   }
 
@@ -276,12 +312,12 @@ library Position {
     _keyTuple[0] = key;
 
     unchecked {
-      _store.updateInField(_tableId, _keyTuple, 2, _index * 1, bytes((_slice)), getValueSchema());
+      _store.updateInField(_tableId, _keyTuple, 3, _index * 1, bytes((_slice)), getValueSchema());
     }
   }
 
   /** Get the full data */
-  function get(bytes32 key) internal view returns (uint32 x, uint32 y, bytes memory mapdata) {
+  function get(bytes32 key) internal view returns (uint32 x, uint32 y, uint32 width, bytes memory mapdata) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = key;
 
@@ -290,7 +326,10 @@ library Position {
   }
 
   /** Get the full data (using the specified store) */
-  function get(IStore _store, bytes32 key) internal view returns (uint32 x, uint32 y, bytes memory mapdata) {
+  function get(
+    IStore _store,
+    bytes32 key
+  ) internal view returns (uint32 x, uint32 y, uint32 width, bytes memory mapdata) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = key;
 
@@ -299,8 +338,8 @@ library Position {
   }
 
   /** Set the full data using individual values */
-  function set(bytes32 key, uint32 x, uint32 y, bytes memory mapdata) internal {
-    bytes memory _data = encode(x, y, mapdata);
+  function set(bytes32 key, uint32 x, uint32 y, uint32 width, bytes memory mapdata) internal {
+    bytes memory _data = encode(x, y, width, mapdata);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = key;
@@ -309,8 +348,8 @@ library Position {
   }
 
   /** Set the full data using individual values (using the specified store) */
-  function set(IStore _store, bytes32 key, uint32 x, uint32 y, bytes memory mapdata) internal {
-    bytes memory _data = encode(x, y, mapdata);
+  function set(IStore _store, bytes32 key, uint32 x, uint32 y, uint32 width, bytes memory mapdata) internal {
+    bytes memory _data = encode(x, y, width, mapdata);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = key;
@@ -322,35 +361,37 @@ library Position {
    * Decode the tightly packed blob using this table's schema.
    * Undefined behaviour for invalid blobs.
    */
-  function decode(bytes memory _blob) internal pure returns (uint32 x, uint32 y, bytes memory mapdata) {
-    // 8 is the total byte length of static data
-    PackedCounter _encodedLengths = PackedCounter.wrap(Bytes.slice32(_blob, 8));
+  function decode(bytes memory _blob) internal pure returns (uint32 x, uint32 y, uint32 width, bytes memory mapdata) {
+    // 12 is the total byte length of static data
+    PackedCounter _encodedLengths = PackedCounter.wrap(Bytes.slice32(_blob, 12));
 
     x = (uint32(Bytes.slice4(_blob, 0)));
 
     y = (uint32(Bytes.slice4(_blob, 4)));
 
+    width = (uint32(Bytes.slice4(_blob, 8)));
+
     // Store trims the blob if dynamic fields are all empty
-    if (_blob.length > 8) {
+    if (_blob.length > 12) {
       // skip static data length + dynamic lengths word
-      uint256 _start = 40;
+      uint256 _start = 44;
       uint256 _end;
       unchecked {
-        _end = 40 + _encodedLengths.atIndex(0);
+        _end = 44 + _encodedLengths.atIndex(0);
       }
       mapdata = (bytes(SliceLib.getSubslice(_blob, _start, _end).toBytes()));
     }
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(uint32 x, uint32 y, bytes memory mapdata) internal pure returns (bytes memory) {
+  function encode(uint32 x, uint32 y, uint32 width, bytes memory mapdata) internal pure returns (bytes memory) {
     PackedCounter _encodedLengths;
     // Lengths are effectively checked during copy by 2**40 bytes exceeding gas limits
     unchecked {
       _encodedLengths = PackedCounterLib.pack(bytes(mapdata).length);
     }
 
-    return abi.encodePacked(x, y, _encodedLengths.unwrap(), bytes((mapdata)));
+    return abi.encodePacked(x, y, width, _encodedLengths.unwrap(), bytes((mapdata)));
   }
 
   /** Encode keys as a bytes32 array using this table's schema */

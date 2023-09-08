@@ -10,25 +10,25 @@ contract MapSystem is System {
     require(!Player.get(player), "already spawned");
 
     Player.set(player, true);
-    Position.set(player, x, y, "");
+    Position.set(player, x, y, 0, "");
     Movable.set(player, true);
   }
 
-  function getData() public view returns(uint32, uint32, bytes memory) {
+  function getData() public view returns(uint32, uint32, uint32, bytes memory) {
     bytes32 player = addressToEntityKey(address(_msgSender()));
     require(Player.get(player), "haven't spawned");
 
     return Position.get(player);
   }
 
-  function move(uint32 x, uint32 y, bytes calldata data) public {
+  function move(uint32 x, uint32 y, uint32 width, bytes calldata data) public {
     bytes32 player = addressToEntityKey(_msgSender());
     require(Movable.get(player), "cannot move");
  
     // (uint32 fromX, uint32 fromY, bytes memory d) = Position.get(player);
     // require(distance(fromX, fromY, x, y) == 1, "can only move to adjacent spaces");
  
-    Position.set(player, x, y, data);
+    Position.set(player, x, y, width, data);
   }
  
   function distance(uint32 fromX, uint32 fromY, uint32 toX, uint32 toY) internal pure returns (uint32) {
