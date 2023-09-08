@@ -163,6 +163,6 @@ export const getFormatMUDData = (data) => {
   return {
     start,
     end,
-    mudData: new Uint8Array(mudData)
+    mudData
   }
 }

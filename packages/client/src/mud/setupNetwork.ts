@@ -4,6 +4,7 @@ import { encodeEntity, syncToRecs } from "@latticexyz/store-sync/recs";
 import { getNetworkConfig } from "./getNetworkConfig";
 import { world } from "./world";
 import { IWorld__factory } from "contracts/types/ethers-contracts/factories/IWorld__factory";
+import MapSystem__factory  from 'contracts/out/MapSystem.sol/MapSystem.json'
 import { createBurnerAccount, createContract, transportObserver, ContractWrite } from "@latticexyz/common";
 import { Subject, share } from "rxjs";
 import mudConfig from "contracts/mud.config";
@@ -32,7 +33,7 @@ export async function setupNetwork() {
   const write$ = new Subject<ContractWrite>();
   const worldContract = createContract({
     address: networkConfig.worldAddress as Hex,
-    abi: IWorld__factory.abi,
+    abi: MapSystem__factory.abi,
     publicClient,
     walletClient: burnerWalletClient,
     onWrite: (write) => write$.next(write),
