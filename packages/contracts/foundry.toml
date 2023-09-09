@@ -30,3 +30,7 @@ eth_rpc_url = "https://sepolia.infura.io/v3/5ca372516740427e97512d4dfefd9c47"
 
 [profile.goerli-testnet]
 eth_rpc_url = "https://goerli.infura.io/v3/5ca372516740427e97512d4dfefd9c47"
+
+[profile.testnet-lootchain]
+eth_rpc_url = "https://testnet.rpc.lootchain.com/http"
+
