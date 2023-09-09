@@ -1,0 +1,131 @@
+$row: 23;
+$col: 43;
+$cellSize: 30px;
+
+.mi-map-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    //background: #f3cf78;
+
+    .tool-tip {
+        display: flex;
+        width: $col * $cellSize;
+        justify-content: space-between;
+        background: rgb(254, 219, 141);
+        border: 3px solid #514b45;
+        border-bottom: 0;
+        border-radius: 10px 10px 0 0;
+
+        ul {
+            display: flex;
+            margin-left: 20px;
+        }
+
+        li {
+            display: flex;
+            align-items: center;
+        }
+
+        .type-count {
+            width: $cellSize;
+        }
+    }
+
+    .opt-wrapper {
+        display: flex;
+        align-items: center;
+
+        button {
+            margin: 0 20px;
+            width: 80px;
+            font-size: 20px;
+            line-height: 40px;
+            border-radius: 6px;
+        }
+
+        .restart {
+            background: #61dafb;
+        }
+
+        .save {
+            background: #47e55a;
+
+            &[disabled] {
+                background: #999;
+                cursor: not-allowed;
+            }
+        }
+
+        .back {
+            background: red;
+
+            a {
+                display: block;
+                color: inherit;
+                text-decoration: none;
+            }
+        }
+    }
+
+    .mi-map-content {
+        min-width: $col * $cellSize;
+        min-height: $row * $cellSize;
+        box-sizing: content-box;
+        border: 3px solid #514b45;
+        background: #eee;
+    }
+
+    .mi-map-row {
+        display: grid;
+        height: $cellSize;
+        grid-template-columns: repeat($col, 1fr);
+    }
+
+    .mi-map-cell {
+        position: relative;
+        height: inherit;
+        background-size: 100%;
+        border: 1px solid #cfc1b3;
+
+        &.target::before {
+            content: '';
+            position: absolute;
+            left: 20%;
+            top: 20%;
+            width: 60%;
+            height: 60%;
+            background: #f00;
+            border-radius: 50%;
+        }
+    }
+
+    .space {
+        background-image: url("/src/assets/earth.png");
+    }
+
+    .grass {
+        background-image: url("/src/assets/grass.png");
+    }
+
+    .hole {
+        background-image: url("/src/assets/hole.png");
+    }
+
+    .stone {
+        background-image: url("/src/assets/stone.png");
+    }
+
+    .wall {
+        background-image: url("/src/assets/wall.png");
+    }
+
+    .water {
+        background-image: url("/src/assets/water.png");
+    }
+
+
+
+}

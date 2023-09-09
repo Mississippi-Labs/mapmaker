@@ -1,0 +1,36 @@
+[profile.default]
+solc_version = "0.8.13"
+ffi = false
+fuzz_runs = 256
+optimizer = true
+optimizer_runs = 3000
+verbosity = 2
+src = "src"
+test = "test"
+out = "out"
+allow_paths = [
+  # pnpm symlinks to the project root's node_modules
+  "../../node_modules",
+  # template uses linked mud packages from within the mud monorepo
+  "../../../../packages",
+  # projects created from this template and using linked mud packages
+  "../../../mud/packages",
+]
+extra_output_files = [
+  "abi",
+  "evm.bytecode"
+]
+fs_permissions = [{ access = "read", path = "./"}]
+
+[profile.op-testnet]
+eth_rpc_url = "https://broken-blissful-snow.optimism-goerli.discover.quiknode.pro/75e24d817fa323c5e800637b6329f93f299b9de1/"
+
+[profile.sepolia-testnet]
+eth_rpc_url = "https://sepolia.infura.io/v3/5ca372516740427e97512d4dfefd9c47"
+
+[profile.goerli-testnet]
+eth_rpc_url = "https://goerli.infura.io/v3/5ca372516740427e97512d4dfefd9c47"
+
+[profile.testnet-lootchain]
+eth_rpc_url = "https://testnet.rpc.lootchain.com/http"
+
